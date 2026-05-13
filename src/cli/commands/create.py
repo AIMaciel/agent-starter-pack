@@ -649,7 +649,13 @@ def replace_region_in_files(
                 modified = True
 
             if modified:
-                file_path.write_text(content)
+                base_dir = project_path.resolve()
+                target_path = file_path.resolve()
+                try:
+                    target_path.relative_to(base_dir)
+                except ValueError:
+                    raise Exception("Invalid file path")
+                target_path.write_text(content)
 
         except UnicodeDecodeError:
             # Skip files that can't be read as text
