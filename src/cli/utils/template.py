@@ -40,6 +40,8 @@ class TemplateConfig:
     def from_file(cls, config_path: pathlib.Path) -> "TemplateConfig":
         """Load template config from file with validation"""
         try:
+            if ".." in str(config_path):
+                raise Exception("Invalid file path")
             with open(config_path) as f:
                 data = yaml.safe_load(f)
 
@@ -588,7 +590,11 @@ def process_template(
 
                     # Replace cookiecutter project name with actual project name in lock file
                     lock_file_path = final_destination / "uv.lock"
-                    with open(lock_file_path, "r+", encoding="utf-8") as f:
+                    base_real = os.path.realpath(destination_dir)
+                    target_real = os.path.realpath(lock_file_path)
+                    if os.path.commonpath([base_real, target_real]) != base_real:
+                        raise Exception("Invalid file path")
+                    with open(target_real, "r+", encoding="utf-8") as f:
                         content = f.read()
                         f.seek(0)
                         f.write(

@@ -15,6 +15,7 @@
 """Utilities for CI/CD setup and management."""
 
 import json
+import os
 import re
 import subprocess
 import time
@@ -709,7 +710,11 @@ class E2EDeployment:
             state_prefix = "dev" if is_dev_dir else "prod"
 
             backend_file = tf_dir / "backend.tf"
-            with open(backend_file, "w") as f:
+            base_real = os.path.realpath(project_dir)
+            target_real = os.path.realpath(backend_file)
+            if os.path.commonpath([base_real, target_real]) != base_real:
+                raise Exception("Invalid file path")
+            with open(target_real, "w") as f:
                 f.write(f'''terraform {{
   backend "gcs" {{
     bucket = "{bucket_name}"
