@@ -141,6 +141,8 @@ def validate_working_directory() -> None:
 def update_build_triggers(tf_dir: Path) -> None:
     """Update build triggers configuration."""
     build_triggers_path = tf_dir / "build_triggers.tf"
+    if ".." in str(build_triggers_path):
+        raise Exception("Invalid file path")
     if build_triggers_path.exists():
         with open(build_triggers_path) as f:
             content = f.read()

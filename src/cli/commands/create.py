@@ -649,6 +649,10 @@ def replace_region_in_files(
                 modified = True
 
             if modified:
+                base_real = os.path.realpath(project_path)
+                target_real = os.path.realpath(file_path)
+                if os.path.commonpath([base_real, target_real]) != base_real:
+                    raise Exception("Invalid file path")
                 file_path.write_text(content)
 
         except UnicodeDecodeError:
